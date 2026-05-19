@@ -1,18 +1,43 @@
-node_modules
-.next
-dist
-out
-build
-.open-next
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
 
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Environment
 .env
-.env.*
-!.env.example
-!.env.local.example
+.env.local
+.env.*.local
 
-*.log
-*.tsbuildinfo
-next-env.d.ts
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-.vercel
-coverage
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Misc
+*.tgz
+.cache/
+
+# Original backup
+.git-mike-backup/
+
+.firecrawl/
+.sisyphus/
+.docs/

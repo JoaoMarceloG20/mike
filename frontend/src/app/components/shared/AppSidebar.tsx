@@ -16,14 +16,14 @@ import { useUserProfile } from "@/contexts/UserProfileContext";
 import { useChatHistoryContext } from "@/app/contexts/ChatHistoryContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { MikeIcon } from "@/components/chat/mike-icon";
+import { VerityIcon } from "@/components/chat/verity-icon";
 import { SidebarChatItem } from "@/app/components/shared/SidebarChatItem";
-import { listProjects } from "@/app/lib/mikeApi";
+import { listProjects } from "@/app/lib/verityApi";
 
 const NAV_ITEMS = [
-    { href: "/assistant", label: "Assistant", icon: MessageSquare },
-    { href: "/projects", label: "Projects", icon: FolderOpen },
-    { href: "/tabular-reviews", label: "Tabular Review", icon: Table2 },
+    { href: "/assistant", label: "Assistente", icon: MessageSquare },
+    { href: "/projects", label: "Projetos", icon: FolderOpen },
+    { href: "/tabular-reviews", label: "Revisão Tabular", icon: Table2 },
     { href: "/workflows", label: "Workflows", icon: Library },
 ];
 
@@ -47,13 +47,23 @@ export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
 
     useEffect(() => {
         if (!user) return;
-        listProjects()
-            .then((projects) => {
-                const map: Record<string, string> = {};
-                for (const p of projects) map[p.id] = p.name;
-                setProjectNames(map);
-            })
-            .catch(() => {});
+        function load() {
+            listProjects()
+                .then((projects) => {
+                    const map: Record<string, string> = {};
+                    for (const p of projects) map[p.id] = p.name;
+                    setProjectNames(map);
+                })
+                .catch(() => {});
+        }
+        load();
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") load();
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        return () =>
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
     }, [user]);
 
     useEffect(() => {
@@ -127,13 +137,13 @@ export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
                             href="/assistant"
                             className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
                         >
-                            <MikeIcon size={22} />
+                            <VerityIcon size={22} />
                             <span
                                 className={`text-2xl font-light font-serif ${
                                     shouldAnimate ? "sidebar-fade-in" : ""
                                 }`}
                             >
-                                Mike
+                                Verity
                             </span>
                         </Link>
                     </div>
@@ -141,7 +151,7 @@ export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
                 <button
                     onClick={onToggle}
                     className="h-9 w-9 p-2.5 items-center flex hover:bg-gray-100 rounded-md transition-colors"
-                    title={isOpen ? "Close sidebar" : "Open sidebar"}
+                    title={isOpen ? "Fechar barra lateral" : "Abrir barra lateral"}
                 >
                     <PanelLeft className="h-4 w-4" />
                 </button>
@@ -190,7 +200,7 @@ export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
                             shouldAnimate ? "sidebar-fade-in" : ""
                         }`}
                     >
-                        <span>Assistant History</span>
+                        <span>Histórico do Assistente</span>
                         <ChevronDown
                             className={`h-3.5 w-3.5 transition-transform ${historyCollapsed ? "-rotate-90" : ""}`}
                         />
@@ -218,7 +228,7 @@ export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
                                     shouldAnimate ? "sidebar-fade-in-2" : ""
                                 }`}
                             >
-                                No chats yet
+                                Nenhuma conversa ainda
                             </div>
                         ) : (
                             <div
@@ -299,7 +309,7 @@ export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
                                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 rounded-md"
                                 >
                                     <User className="h-4 w-4" />
-                                    Account Settings
+                                    Configurações da Conta
                                 </button>
                             </div>
                         )}

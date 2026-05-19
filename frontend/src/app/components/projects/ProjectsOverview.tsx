@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, FolderOpen, ChevronDown } from "lucide-react";
 import { HeaderSearchBtn } from "@/app/components/shared/HeaderSearchBtn";
-import { listProjects, updateProject, deleteProject } from "@/app/lib/mikeApi";
+import { listProjects, updateProject, deleteProject } from "@/app/lib/verityApi";
 import { OwnerOnlyModal } from "@/app/components/shared/OwnerOnlyModal";
 import { useAuth } from "@/contexts/AuthContext";
-import type { MikeProject } from "@/app/components/shared/types";
+import type { VerityProject } from "@/app/components/shared/types";
 import { NewProjectModal } from "./NewProjectModal";
 import { ToolbarTabs } from "@/app/components/shared/ToolbarTabs";
 import { RowActions } from "@/app/components/shared/RowActions";
@@ -26,7 +26,7 @@ const CHECK_W = "w-8 shrink-0";
 const NAME_COL_W = "w-[300px] shrink-0";
 
 export function ProjectsOverview() {
-    const [projects, setProjects] = useState<MikeProject[]>([]);
+    const [projects, setProjects] = useState<VerityProject[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<Tab>("all");
@@ -43,10 +43,21 @@ export function ProjectsOverview() {
     const { user } = useAuth();
 
     useEffect(() => {
-        listProjects()
-            .then(setProjects)
-            .catch(() => setProjects([]))
-            .finally(() => setLoading(false));
+        function load() {
+            setLoading(true);
+            listProjects()
+                .then(setProjects)
+                .catch(() => setProjects([]))
+                .finally(() => setLoading(false));
+        }
+        load();
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") load();
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        return () =>
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
     }, []);
 
     useEffect(() => {
@@ -100,9 +111,9 @@ export function ProjectsOverview() {
     }
 
     const tabs: { id: Tab; label: string }[] = [
-        { id: "all", label: "All" },
-        { id: "mine", label: "Mine" },
-        { id: "shared-with-me", label: "Shared with me" },
+        { id: "all", label: "Todos" },
+        { id: "mine", label: "Meus" },
+        { id: "shared-with-me", label: "Compartilhados comigo" },
     ];
 
     async function handleRenameSubmit(projectId: string) {
@@ -184,7 +195,7 @@ export function ProjectsOverview() {
                     <HeaderSearchBtn
                         value={search}
                         onChange={setSearch}
-                        placeholder="Search projects…"
+                        placeholder="Buscar projetos…"
                     />
                     <button
                         onClick={() => setModalOpen(true)}
@@ -227,9 +238,9 @@ export function ProjectsOverview() {
                     <div className="w-24 shrink-0 text-left">Files</div>
                     <div className="w-24 shrink-0 text-left">Chats</div>
                     <div className="w-36 shrink-0 text-left">
-                        Tabular Reviews
+                        Revisões Tabulares
                     </div>
-                    <div className="w-32 shrink-0 text-left">Created</div>
+                    <div className="w-32 shrink-0 text-left">Criado em</div>
                     <div className="w-8 shrink-0" />
                 </div>
 
